@@ -1,0 +1,61 @@
+import React, { DragEvent, FC, useContext } from "react";
+import { useRouter } from "next/router";
+import {
+  Card,
+  CardActionArea,
+  CardActions,
+  CardContent,
+  Typography,
+} from "@mui/material";
+// MIS COMPONENTES
+import { Entry } from "../../interfaces";
+import { UIContext } from "../../context/ui";
+import { dateFunctions } from "../../utils";
+
+// INTERFACE
+interface Props {
+  entry: Entry;
+}
+// INICIO
+export const EntryCard: FC<Props> = ({ entry }) => {
+  // HOOKS
+  const { startDragging, endDragging } = useContext(UIContext);
+  const router = useRouter();
+  // FUNCIONES
+  const onDragStart = (e: DragEvent<HTMLDivElement>): void => {
+    e.dataTransfer.setData("text", entry._id);
+    startDragging();
+  };
+  const onDragEnd = (): void => {
+    endDragging();
+  };
+  const onClick = (): void => {
+    router.push(`/entries/${entry._id}`);
+  };
+
+  // RENDER
+  return (
+    <Card
+      sx={{ marginBottom: 1 }}
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onClick={onClick}
+    >
+      <CardActionArea>
+        <CardContent>
+          <Typography sx={{ whiteSpace: "pre-line" }}>
+            {entry.description}
+          </Typography>
+        </CardContent>
+        <CardActions
+          sx={{ display: "flex", justifyContent: "end", paddingRight: 2 }}
+        >
+          <Typography variant="body2">
+            {dateFunctions.getFormatDistanceToNow(entry.createdAt)}
+          </Typography>
+        </CardActions>
+      </CardActionArea>
+    </Card>
+  );
+};
